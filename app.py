@@ -81,9 +81,9 @@ def predict():
         print(question)
         chat_response = conversation_chain({'question': f'{question}'})
         results = {
-            'question': chat_response['question'],
-            'answer': f'{chat_response['answer']}',
-            'chat_history': chat_response['chat_history'],
+            'question': f"{chat_response['question']}",
+            'answer': f"{chat_response['answer']}",
+            'chat_history': f"{chat_response['chat_history']}",
 
         }
 
