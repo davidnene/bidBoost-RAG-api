@@ -23,8 +23,6 @@ app = Flask(__name__)
 
 data_path = 'data/proposals'
 
-app = Flask(__name__)
-
 UPLOAD_FOLDER = 'data/proposals'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
