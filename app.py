@@ -41,14 +41,15 @@ documents = []
 page_contents = []
 
 # Extract source and document information from file paths
-for pdf in loaded_pdfs:
-  loader = PyPDFLoader(pdf)
-  pages = loader.load()
-  pdf_name = re.search(r'[^/]+$', pdf).group(0)
-  for document in pages:
-    sources.append(pdf_name)
-    documents.append(document)
-    page_contents.append(document.page_content)
+if loaded_pdfs != []:
+    for pdf in loaded_pdfs:
+        loader = PyPDFLoader(pdf)
+        pages = loader.load()
+        pdf_name = re.search(r'[^/]+$', pdf).group(0)
+    for document in pages:
+        sources.append(pdf_name)
+        documents.append(document)
+        page_contents.append(document.page_content)
 
 df = pd.DataFrame({
     'Source': sources,
