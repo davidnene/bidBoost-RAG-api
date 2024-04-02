@@ -124,7 +124,7 @@ def delete_files():
             os.remove(file_path)  # Delete the file
     # delete memory
     conversation_chain.memory = None
-    conversation_chain.memory.clear()
+    # conversation_chain.memory.clear()
 
 
     
