@@ -86,7 +86,6 @@ memory=memory)
 @app.route('/predict', methods=['POST'])
 def predict():
         question = request.get_json()['question']
-        print(question)
         chat_response = conversation_chain({'question': f'{question}'})
         results = {
             'question': f"{chat_response['question']}",
@@ -114,5 +113,5 @@ def upload_files():
     return jsonify({'message': 'Files uploaded successfully'}), 200
 
 if __name__ == '__main__':
-    serve(app, host='0.0.0.0', port=5000)
+    serve(app, listen='*:8080')
 
