@@ -112,6 +112,21 @@ def upload_files():
 
     return jsonify({'message': 'Files uploaded successfully'}), 200
 
+@app.route('/delete', methods=['DELETE'])
+def delete_files():
+    files_to_keep = ['sample.pdf']  
+    upload_folder = app.config['UPLOAD_FOLDER']
+
+    # Iterate over all files in the upload folder
+    for filename in os.listdir(upload_folder):
+        if filename not in files_to_keep:
+            file_path = os.path.join(upload_folder, filename)
+            os.remove(file_path)  # Delete the file
+    # conversation_chain.memory = []
+    conversation_chain.memory.clear()
+    # delete memory
+    
+    return jsonify({'message': 'Files deleted successfully'}), 200
 if __name__ == '__main__':
     serve(app, listen='*:8080')
 
