@@ -41,49 +41,47 @@ documents = []
 page_contents = []
 
 # Extract source and document information from file paths
-if loaded_pdfs != []:
-    for pdf in loaded_pdfs:
-        loader = PyPDFLoader(pdf)
-        pages = loader.load()
-        pdf_name = re.search(r'[^/]+$', pdf).group(0)
-    for document in pages:
-        sources.append(pdf_name)
-        documents.append(document)
-        page_contents.append(document.page_content)
-    df = pd.DataFrame({
+for pdf in loaded_pdfs:
+  loader = PyPDFLoader(pdf)
+  pages = loader.load()
+  pdf_name = re.search(r'[^/]+$', pdf).group(0)
+  for document in pages:
+    sources.append(pdf_name)
+    documents.append(document)
+    page_contents.append(document.page_content)
+
+df = pd.DataFrame({
     'Source': sources,
     'Document': documents,
     'Page Content': page_contents
-    })
+})
 
-    # intialize token splitter
-    token_text_splitter = TokenTextSplitter(
-        chunk_size=500,
-        chunk_overlap=80
-    )
+# intialize token splitter
+token_text_splitter = TokenTextSplitter(
+    chunk_size=500,
+    chunk_overlap=80
+)
 
-    # pass the splitter to the documents
-    tokenized_docs = token_text_splitter.split_documents(documents)
-    embedding = OpenAIEmbeddings(model="text-embedding-ada-002")
+# pass the splitter to the documents
+tokenized_docs = token_text_splitter.split_documents(documents)
+embedding = OpenAIEmbeddings(model="text-embedding-ada-002")
 
-    persist_directory = './chroma/'
+persist_directory = './chroma/'
 
-    # loading intializing chroma with both embeddings and tokens
-    vectordb = Chroma.from_documents(
-        documents=tokenized_docs,
-        embedding=embedding,
-        persist_directory=persist_directory
-    )
+# loading intializing chroma with both embeddings and tokens
+vectordb = Chroma.from_documents(
+    documents=tokenized_docs,
+    embedding=embedding,
+    persist_directory=persist_directory
+)
 
-    llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
+llm = ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0)
 
-    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
-    conversation_chain = ConversationalRetrievalChain.from_llm(
-    llm = llm,
-    retriever=vectordb.as_retriever(),
-    memory=memory)
-
-
+memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
+conversation_chain = ConversationalRetrievalChain.from_llm(
+llm = llm,
+retriever=vectordb.as_retriever(),
+memory=memory)
 
 
 
