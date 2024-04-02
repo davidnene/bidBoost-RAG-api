@@ -109,6 +109,7 @@ def upload_files():
         else:
             filename = file.filename
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    loaded_pdfs.extend([os.path.join(data_path, fname) for fname in os.listdir(data_path)])
 
     return jsonify({'message': 'Files uploaded successfully'}), 200
 
@@ -122,9 +123,9 @@ def delete_files():
         if filename not in files_to_keep:
             file_path = os.path.join(upload_folder, filename)
             os.remove(file_path)  # Delete the file
-    # delete memory
-    conversation_chain.memory = ''
-    # conversation_chain.memory.clear()
+    # delete conversation memory
+    # conversation_chain.memory = ''
+    conversation_chain.memory.clear()
 
 
     
