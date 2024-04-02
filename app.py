@@ -123,7 +123,7 @@ def delete_files():
             file_path = os.path.join(upload_folder, filename)
             os.remove(file_path)  # Delete the file
     # delete memory
-    conversation_chain.memory = None
+    conversation_chain.memory = ''
     # conversation_chain.memory.clear()
 
 
