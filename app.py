@@ -122,8 +122,9 @@ def delete_files():
         if filename not in files_to_keep:
             file_path = os.path.join(upload_folder, filename)
             os.remove(file_path)  # Delete the file
-    # conversation_chain.memory = []
+    conversation_chain.memory = []
     conversation_chain.memory.clear()
+    
     # delete memory
     
     return jsonify({'message': 'Files deleted successfully'}), 200
