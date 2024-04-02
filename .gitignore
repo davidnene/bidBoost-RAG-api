@@ -2,4 +2,4 @@
 .env
 chroma
 data/proposals/*
-
+__pycache__

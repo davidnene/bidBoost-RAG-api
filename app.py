@@ -15,11 +15,21 @@ from langchain.chains import RetrievalQA
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 
+from waitress import serve
+
 
 
 app = Flask(__name__)
 
 data_path = 'data/proposals'
+
+app = Flask(__name__)
+
+UPLOAD_FOLDER = 'data/proposals'
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 #store file paths in a list
 loaded_pdfs = [os.path.join(data_path, fname) for fname in os.listdir(data_path)]
@@ -89,10 +99,22 @@ def predict():
 
         return jsonify(results)
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/upload', methods=['POST'])
+def upload_files():
+    files = request.files.getlist('file')
 
-@app.route('/test', methods=['GET'])
-def load():
-    print(loaded_pdfs)
-    return loaded_pdfs
+    if not files:
+        return jsonify({'error': 'No files uploaded'}), 400
+
+    for file in files:
+        if file.filename == '':
+            return jsonify({'error': 'One or more files have no selected file'}), 400
+        else:
+            filename = file.filename
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+    return jsonify({'message': 'Files uploaded successfully'}), 200
+
+if __name__ == '__main__':
+    serve(app, host='0.0.0.0', port=5000)
+
