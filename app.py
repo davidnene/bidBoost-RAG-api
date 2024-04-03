@@ -130,6 +130,8 @@ def delete_files():
 
     
     return jsonify({'message': 'Files deleted successfully'}), 200
+
+port = int(os.environ.get('PORT', 8080))
 if __name__ == '__main__':
-    serve(app, listen='*:8080')
+    serve(app, listen=f'*:{port}')
 
