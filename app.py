@@ -85,16 +85,24 @@ memory=memory)
 
 @app.route('/predict', methods=['POST'])
 def predict():
+        conversation_chain = ConversationalRetrievalChain.from_llm(
+        llm = llm,
+        retriever=vectordb.as_retriever(),
+        memory=memory)
         question = request.get_json()['question']
-        chat_response = conversation_chain({'question': f'{question}'})
-        results = {
-            'question': f"{chat_response['question']}",
-            'answer': f"{chat_response['answer']}",
-            'chat_history': f"{chat_response['chat_history']}",
 
-        }
+        if vectordb._client.list_collections():
+            chat_response = conversation_chain({'question': f'{question}'})
+            results = {
+                'question': f"{chat_response['question']}",
+                'answer': f"{chat_response['answer']}",
+                'chat_history': f"{chat_response['chat_history']}",
 
-        return jsonify(results)
+            }
+
+            return jsonify(results)
+        else:
+            return {"error":"Please upload proposals"}
 
 @app.route('/upload', methods=['POST'])
 def upload_files():
@@ -109,7 +117,6 @@ def upload_files():
         else:
             filename = file.filename
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-    loaded_pdfs.extend([os.path.join(data_path, fname) for fname in os.listdir(data_path)])
 
     return jsonify({'message': 'Files uploaded successfully'}), 200
 
@@ -124,11 +131,17 @@ def delete_files():
             file_path = os.path.join(upload_folder, filename)
             os.remove(file_path)  # Delete the file
     # delete conversation memory
-    # conversation_chain.memory = ''
     conversation_chain.memory.clear()
+    # clear chromadb
+    # for collection in vectordb._client.list_collections():
+    #     ids = collection.get()['ids'][:5461]
+    #     ids2 = collection.get()['ids'][:5461]
+    #     print('REMOVE %s document(s) from %s collection' % (str(len(ids)), collection.name))
+    #     if len(ids):
+    #          collection.delete(ids) 
+    #          collection.delete(ids2)
+    vectordb.delete_collection()
 
-
-    
     return jsonify({'message': 'Files deleted successfully'}), 200
 
 port = int(os.environ.get('PORT', 8080))
