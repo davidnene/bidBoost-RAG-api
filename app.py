@@ -79,6 +79,10 @@ def initialize_app():
 
 conversation_chain = initialize_app()
 
+@app.route('/test', methods=['GET'])
+def test():
+    return '<h1>API Working! :-)</h1>'
+
 @app.route('/predict', methods=['POST'])
 def predict():
     question = request.get_json().get('question')
