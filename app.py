@@ -67,8 +67,8 @@ def initialize_app():
     })
 
     token_text_splitter = TokenTextSplitter(
-        chunk_size=300,
-        chunk_overlap=50
+        chunk_size=1000,
+        chunk_overlap=100
     )
 
     tokenized_docs = token_text_splitter.split_documents(documents)
