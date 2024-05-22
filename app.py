@@ -113,7 +113,7 @@ def predict():
             }
             return jsonify(results)
         else:
-            return {"error": "Please upload proposals"}
+            return jsonify({"error": "Please upload proposals"}), 400
     else:
         return jsonify({'error': 'No question provided'}), 400
 
