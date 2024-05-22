@@ -81,7 +81,7 @@ def initialize_app():
         persist_directory=persist_directory
     )
 
-    llm = ChatOpenAI(model_name="gpt-4-turbo", temperature=1, max_tokens=1000)
+    llm = ChatOpenAI(model_name="gpt-4-turbo", temperature=0, max_tokens=2000)
 
     memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
     conversation_chain = ConversationalRetrievalChain.from_llm(
