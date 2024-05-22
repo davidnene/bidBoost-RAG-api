@@ -2,4 +2,5 @@
 .env
 data/proposals/*
 chroma
+data/output.md
 __pycache__
