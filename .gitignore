@@ -1,5 +1,5 @@
 .venv
 .env
-data/proposals/*
+# data/proposals/*
 chroma
 __pycache__

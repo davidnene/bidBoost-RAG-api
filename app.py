@@ -133,6 +133,9 @@ def upload_files():
             filename = file.filename
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
+    with open('data/output.md', 'w', encoding='utf-8') as f:  
+        for doc in documents:
+            f.write(doc.page_content + '\n')
     conversation_chain = initialize_app()
 
     return jsonify({'message': 'Files uploaded successfully'}), 200
