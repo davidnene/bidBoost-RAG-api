@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import os
 from langchain.document_loaders import PyPDFLoader
 import re
+from dotenv import load_dotenv
 import pandas as pd
 from langchain.text_splitter import TokenTextSplitter
 from langchain_openai import OpenAIEmbeddings
@@ -11,6 +12,10 @@ from langchain.chains import RetrievalQA
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from waitress import serve
+from llama_parse import LlamaParse
+from langchain.schema import Document
+from llama_index.core import SimpleDirectoryReader
+import nest_asyncio
 
 app = Flask(__name__)
 
@@ -33,14 +38,24 @@ def extract_file_data():
 
     loaded_pdfs = [os.path.join(data_path, fname) for fname in os.listdir(data_path)]
 
+    load_dotenv()
+    # set up parser
+    parser = LlamaParse(
+        result_type="markdown"  # "markdown" and "text" are available
+    )
+    
+    file_extractor = {".pdf": parser}
     for pdf in loaded_pdfs:
-        loader = PyPDFLoader(pdf)
-        pages = loader.load()
+        pages = SimpleDirectoryReader(input_files=[pdf], file_extractor=file_extractor).load_data(nest_asyncio.apply())
         pdf_name = re.search(r'[^/]+$', pdf).group(0)
         for document in pages:
             sources.append(pdf_name)
-            documents.append(document)
-            page_contents.append(document.page_content)
+            metadata = {
+                "source": f"{pdf_name}",
+            }
+            lp_parsed_documents = Document(page_content=document.text, metadata=metadata)
+            documents.append(lp_parsed_documents)
+            page_contents.append(document.text)
 
 def initialize_app():
     extract_file_data()
@@ -52,8 +67,8 @@ def initialize_app():
     })
 
     token_text_splitter = TokenTextSplitter(
-        chunk_size=500,
-        chunk_overlap=80
+        chunk_size=300,
+        chunk_overlap=50
     )
 
     tokenized_docs = token_text_splitter.split_documents(documents)
@@ -72,7 +87,8 @@ def initialize_app():
     conversation_chain = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=vectordb.as_retriever(),
-        memory=memory
+        memory=memory,
+        chain_type='stuff'
     )
 
     return conversation_chain
